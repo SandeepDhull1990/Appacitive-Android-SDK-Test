@@ -3,12 +3,14 @@ package com.appacitive.android.tests;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import android.os.Handler;
 import android.test.AndroidTestCase;
+import android.test.UiThreadTest;
+import android.util.Log;
 
 import com.appacitive.android.callbacks.AppacitiveCallback;
 import com.appacitive.android.model.Appacitive;
 import com.appacitive.android.model.AppacitiveError;
-import com.example.appacitive_android_sdk_tests.BuildConfig;
 
 public class AppacitiveTest extends AndroidTestCase {
 	
@@ -19,23 +21,31 @@ public class AppacitiveTest extends AndroidTestCase {
 	/*
 	 * Purpose : Test the appacitive session initialization for valid session id
 	 */
-	public void testAppacitiveInitializationForValidAPIKey() throws InterruptedException {
+	@UiThreadTest
+	public void testAppacitiveInitializationForValidAPIKey() throws Throwable {
 		final CountDownLatch signal = new CountDownLatch(1);
-		
-		Appacitive.initializeAppacitive(getContext(), BuildConfig.API_KEY, new AppacitiveCallback() {
-			
-			@Override
-			public void onSuccess() {
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				signal.countDown();
-			}
-		});
-		signal.await(30, TimeUnit.SECONDS);
-		assertNotNull("Appacitive session is not initialized",Appacitive.getInstance().getSessionId());
+			new Handler(getContext().getMainLooper()).post(new Runnable() {
+				
+				@Override
+				public void run() {
+					Appacitive.initializeAppacitive("ukaAo61yoZoeTJsGacH9TDRHnhf/J9/kH2TStR5sD3k=", new AppacitiveCallback() {
+						
+						@Override
+						public void onSuccess() {
+							Log.d("TAG", "Appacitive session init id is " + Appacitive.getInstance().getSessionId());
+							signal.countDown();
+						}
+						
+						@Override
+						public void onFailure(AppacitiveError error) {
+							Log.d("TAG", "Appacitive session init error is " + error.toString());
+							signal.countDown();
+						}
+					});
+				}
+			});
+		signal.await(45, TimeUnit.SECONDS);
+		assertNotNull("Appacitive session is not initialized", Appacitive.getInstance().getSessionId());
 	}
 	
 	/*
@@ -43,16 +53,22 @@ public class AppacitiveTest extends AndroidTestCase {
 	 */
 	public void testAppacitiveInitializationForInvalidAPIKey() throws InterruptedException {
 		final CountDownLatch signal = new CountDownLatch(1);
-		Appacitive.initializeAppacitive(getContext(), "", new AppacitiveCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess() {
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				signal.countDown();
+			public void run() {
+				Appacitive.initializeAppacitive("", new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						signal.countDown();
+					}
+				});
 			}
 		});
 		signal.await(15, TimeUnit.SECONDS);
@@ -64,16 +80,22 @@ public class AppacitiveTest extends AndroidTestCase {
 	 */
 	public void testAppacitiveInitializationForNullAPIKey() throws InterruptedException {
 		final CountDownLatch signal = new CountDownLatch(1);
-		Appacitive.initializeAppacitive(getContext(), "", new AppacitiveCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess() {
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				signal.countDown();
+			public void run() {
+				Appacitive.initializeAppacitive("", new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						signal.countDown();
+					}
+				});
 			}
 		});
 		signal.await(15, TimeUnit.SECONDS);
