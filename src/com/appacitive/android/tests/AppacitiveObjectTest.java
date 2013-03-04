@@ -1,20 +1,23 @@
 package com.appacitive.android.tests;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import android.os.Handler;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.appacitive.android.callbacks.AppacitiveCallback;
 import com.appacitive.android.callbacks.AppacitiveFetchCallback;
 import com.appacitive.android.model.Appacitive;
+import com.appacitive.android.model.AppacitiveDistanceMetrics;
 import com.appacitive.android.model.AppacitiveError;
 import com.appacitive.android.model.AppacitiveObject;
+import com.appacitive.android.model.AppacitivePagingInfo;
 import com.appacitive.android.model.AppacitiveQuery;
-import com.example.appacitive_android_sdk_tests.BuildConfig;
+import com.example.appacitive_android_sdk_tests.R;
 
 public class AppacitiveObjectTest extends AndroidTestCase {
 	
@@ -23,19 +26,25 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		final CountDownLatch signal = new CountDownLatch(1);
-		Appacitive.initializeAppacitive(getContext(), BuildConfig.API_KEY, new AppacitiveCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess() {
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				signal.countDown();
+			public void run() {
+				Appacitive.initializeAppacitive(getContext().getResources().getString(R.string.API_KEY), new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						signal.countDown();
+					}
+				});
 			}
 		});
-		signal.await(15, TimeUnit.SECONDS);
+		signal.await(45, TimeUnit.SECONDS);
 	}
 	
 	/*
@@ -44,27 +53,33 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testSaveForValidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject object = new AppacitiveObject("tasks");
-		object.addProperty("task_name", "Buy new shoes");
-		object.addProperty("completed_at", "2013-02-02");
-		object.addAttribute("test", "test");
-		object.addAttribute("test1", "test2");
-		object.addTag("Demo");
-		object.saveObject(new AppacitiveCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess() {
-				isTestSuccessfull = true;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = false;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject object = new AppacitiveObject("tasks");
+				object.addProperty("task_name", "Buy new shoes");
+				object.addProperty("completed_at", "2013-02-02");
+				object.addAttribute("test", "test");
+				object.addAttribute("test1", "test2");
+				object.addTag("Demo");
+				object.saveObject(new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+				});
 			}
 		});
-		signal.await(15, TimeUnit.SECONDS);
+		signal.await(45, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
 	
@@ -74,21 +89,27 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testSaveForInvalidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject object = new AppacitiveObject("");
-		object.addProperty("task_name", "Buy new shoes");
-		object.addProperty("completed_at", "2013-02-02");
-		object.saveObject(new AppacitiveCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess() {
-				isTestSuccessfull = false;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = true;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject object = new AppacitiveObject("");
+				object.addProperty("task_name", "Buy new shoes");
+				object.addProperty("completed_at", "2013-02-02");
+				object.saveObject(new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+				});
 			}
 		});
 		signal.await(15, TimeUnit.SECONDS);
@@ -101,21 +122,27 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testSaveForNullSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject object = new AppacitiveObject(null);
-		object.addProperty("task_name", "Buy new shoes");
-		object.addProperty("completed_at", "2013-02-02");
-		object.saveObject(new AppacitiveCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess() {
-				isTestSuccessfull = false;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = true;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject object = new AppacitiveObject(null);
+				object.addProperty("task_name", "Buy new shoes");
+				object.addProperty("completed_at", "2013-02-02");
+				object.saveObject(new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+				});
 			}
 		});
 		signal.await(15, TimeUnit.SECONDS);
@@ -128,23 +155,28 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testSearchForValidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		
-		AppacitiveObject.searchAllObjects("tasks", new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = true;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = false;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject.searchAllObjects("tasks", new AppacitiveFetchCallback<AppacitiveObject>() {
+					
+					@Override
+					public void onSuccess(List<AppacitiveObject> response,
+							AppacitivePagingInfo pagingInfo) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+				});
 			}
 		});
-		
-		signal.await(15, TimeUnit.SECONDS);
+		signal.await(45, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
 	
@@ -154,22 +186,27 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testSearchForInvalidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		
-		AppacitiveObject.searchAllObjects("", new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = false;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = true;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject.searchAllObjects("", new AppacitiveFetchCallback<AppacitiveObject>() {
+					
+					@Override
+					public void onSuccess(List<AppacitiveObject> response,
+							AppacitivePagingInfo pagingInfo) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+				});
 			}
 		});
-		
 		signal.await(15, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
@@ -180,26 +217,43 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testSearchObjectForValidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		ArrayList<String> tags = new ArrayList<String>();
-		tags.add("Demo");
-		String query = AppacitiveQuery.queryStringForSearchWithOneOrMoreTags(tags);
-		AppacitiveObject.searchObjects("tasks", "query=" + query, new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = true;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				Log.d("TAG", "The response is " + error.toString());
-				isTestSuccessfull = false;
-				signal.countDown();
+			public void run() {
+//				ArrayList<String> tags = new ArrayList<String>();
+				//tags.add("Demo");
+//		String query = AppacitiveQuery.queryStringForSearchWithOneOrMoreTags(tags);
+				String pageSize = AppacitiveQuery.queryStringForPageSize(68);
+				String pageNum = AppacitiveQuery.queryStringForPageNumber(1);
+				
+				String geocodeStr = AppacitiveQuery.queryStringForGeocodeProperty("geolocation", 18.538434200000000,73.900020100000000, 2, AppacitiveDistanceMetrics.KILOMETERS);
+				ArrayList<String> queries = new ArrayList<String>();
+				queries.add(pageNum);
+				queries.add(pageSize);
+				queries.add(geocodeStr);
+				
+				String query = AppacitiveQuery.generateANDQueryStringForQueries(queries);		
+				AppacitiveObject.searchObjects("tasks", query, new AppacitiveFetchCallback<AppacitiveObject>() {
+					
+					@Override
+					public void onSuccess(List<AppacitiveObject> response,
+							AppacitivePagingInfo pagingInfo) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						Log.d("TAG", "The response is " + error.toString());
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+				});
 			}
 		});
 		
-		signal.await(15, TimeUnit.SECONDS);
+		signal.await(45, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
 	
@@ -209,18 +263,25 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testSearchObjectForInvalidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject.searchObjects("", "query=abc++1", new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = false;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = true;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject.searchObjects("", "query=abc++1", new AppacitiveFetchCallback<AppacitiveObject>() {
+					
+					@Override
+					public void onSuccess(List<AppacitiveObject> response,
+							AppacitivePagingInfo pagingInfo) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+				});
 			}
 		});
 		
@@ -235,23 +296,29 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testFetchObjectForValidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject appacitiveObject = new AppacitiveObject("tasks");
-		appacitiveObject.setObjectId(18425911758160389l);
-		appacitiveObject.fetchObject(new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = true;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = false;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject appacitiveObject = new AppacitiveObject("tasks");
+				appacitiveObject.setObjectId(19147251005916112l);
+				appacitiveObject.fetchObject(new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+				});
 			}
 		});
-		signal.await(15, TimeUnit.SECONDS);
+		signal.await(45, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
 	
@@ -261,19 +328,25 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testFetchObjectForInvalidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject appacitiveObject = new AppacitiveObject("");
-		appacitiveObject.fetchObject(new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = false;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = true;
-				signal.countDown();
+			public void run() {
+				AppacitiveObject appacitiveObject = new AppacitiveObject("");
+				appacitiveObject.fetchObject(new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+				});
 			}
 		});
 		signal.await(15, TimeUnit.SECONDS);
@@ -286,26 +359,32 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testFetchMultipleObjectWithIdsForValidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		ArrayList<String> ids = new ArrayList<String>();
-		ids.add("18433450635822092");
-		ids.add("18433296495149332");
-		ids.add("18433052942402571");
-		AppacitiveObject.fetchObjectsWithIds(ids, "tasks", new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = true;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = false;
-				signal.countDown();
+			public void run() {
+				ArrayList<String> ids = new ArrayList<String>();
+				ids.add("19146246823477975");
+				ids.add("19146231676797653");
+				ids.add("19147251005916112");
+				AppacitiveObject.fetchObjectsWithIds(ids, "tasks", new AppacitiveFetchCallback<AppacitiveObject>() {
+					
+					@Override
+					public void onSuccess(List<AppacitiveObject> response,
+							AppacitivePagingInfo pagingInfo) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+				});
 			}
 		});
-		
-		signal.await(15, TimeUnit.SECONDS);
+		signal.await(45, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
 	
@@ -315,25 +394,31 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testFetchMultipleObjectWithIdsForInvalidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		ArrayList<String> ids = new ArrayList<String>();
-		ids.add("18425911758160389");
-		ids.add("18423952835740164");
-		ids.add("18423016526578433");
-		AppacitiveObject.fetchObjectsWithIds(ids, "", new AppacitiveFetchCallback() {
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
 			
 			@Override
-			public void onSuccess(Map<String, Object> response) {
-				isTestSuccessfull = false;
-				signal.countDown();
-			}
-			
-			@Override
-			public void onFailure(AppacitiveError error) {
-				isTestSuccessfull = true;
-				signal.countDown();
+			public void run() {
+				ArrayList<String> ids = new ArrayList<String>();
+				ids.add("18425911758160389");
+				ids.add("18423952835740164");
+				ids.add("18423016526578433");
+				AppacitiveObject.fetchObjectsWithIds(ids, "", new AppacitiveFetchCallback<AppacitiveObject>() {
+					
+					@Override
+					public void onSuccess(List<AppacitiveObject> response,
+							AppacitivePagingInfo pagingInfo) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+				});
 			}
 		});
-		
 		signal.await(15, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
@@ -344,10 +429,42 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testDeleteObjectWithValidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject object = new AppacitiveObject("tasks");
-		object.setObjectId(18429902315455236l);
-		object.deleteObject();
-		signal.await(15, TimeUnit.SECONDS);
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
+			
+			@Override
+			public void run() {
+				AppacitiveObject.searchAllObjects("tasks", new AppacitiveFetchCallback<AppacitiveObject>() {
+
+					@Override
+					public void onSuccess(List<AppacitiveObject> response,
+							AppacitivePagingInfo pagingInfo) {
+						AppacitiveObject object = new AppacitiveObject("tasks");
+						object.setObjectId(response.get(0).getObjectId());
+						object.deleteObject(new AppacitiveCallback() {
+							
+							@Override
+							public void onSuccess() {
+								isTestSuccessfull = true;
+								signal.countDown();
+							}
+							
+							@Override
+							public void onFailure(AppacitiveError error) {
+								isTestSuccessfull = false;
+								signal.countDown();
+							}
+						});
+					}
+
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+				});
+			}
+		});
+		signal.await(45, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
 	
@@ -357,15 +474,35 @@ public class AppacitiveObjectTest extends AndroidTestCase {
 	public void testDeleteObjectWithInvalidSchemaName() throws InterruptedException {
 		isTestSuccessfull = false;
 		final CountDownLatch signal = new CountDownLatch(1);
-		AppacitiveObject object = new AppacitiveObject("abc++2");
-		object.setObjectId(18429902315455236l);
-		object.deleteObject();
+		new Handler(getContext().getMainLooper()).post(new Runnable() {
+			
+			@Override
+			public void run() {
+				AppacitiveObject object = new AppacitiveObject("abc++2");
+				object.setObjectId(18429902315455236l);
+				object.deleteObject(new AppacitiveCallback() {
+					
+					@Override
+					public void onSuccess() {
+						isTestSuccessfull = false;
+						signal.countDown();
+					}
+					
+					@Override
+					public void onFailure(AppacitiveError error) {
+						isTestSuccessfull = true;
+						signal.countDown();
+					}
+				});
+			}
+		});
 		signal.await(15, TimeUnit.SECONDS);
 		assertEquals(true, isTestSuccessfull);
 	}
 	
 	@Override
 	protected void tearDown() throws Exception {
-		Appacitive.endSession();
+		Appacitive appacitive = Appacitive.getInstance();
+		appacitive.endSession();
 	}
 }

@@ -8,14 +8,14 @@ import android.test.AndroidTestCase;
 import com.appacitive.android.callbacks.AppacitiveCallback;
 import com.appacitive.android.model.Appacitive;
 import com.appacitive.android.model.AppacitiveError;
-import com.example.appacitive_android_sdk_tests.BuildConfig;
+import com.example.appacitive_android_sdk_tests.R;
 
 public class AppacitiveInteraceTest extends AndroidTestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
 		final CountDownLatch signal = new CountDownLatch(1);
-		Appacitive.initializeAppacitive(getContext(), BuildConfig.API_KEY, new AppacitiveCallback() {
+		Appacitive.initializeAppacitive(getContext().getResources().getString(R.string.API_KEY), new AppacitiveCallback() {
 			
 			@Override
 			public void onSuccess() {
@@ -53,7 +53,8 @@ public class AppacitiveInteraceTest extends AndroidTestCase {
 	
 	@Override
 	protected void tearDown() throws Exception {
-		Appacitive.endSession();
+		Appacitive appacitive = Appacitive.getInstance();
+		appacitive.endSession();
 	}
 
 }
